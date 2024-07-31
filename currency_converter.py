@@ -26,15 +26,15 @@ def api_parse():
 
 def output_all_currencies(data):
     for item in data['data']:
-        print(item)
-    return 0
+        if item in currency_lst.keys():
+            print(f"{item} - {currency_lst[item]}")
 
 
 def main():
     args = create_parser()
     data = api_parse()
     if args.all:
-        output = output_all_currencies(data)
+        output_all_currencies(data)
 
 
 if __name__ == "__main__":
