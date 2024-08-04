@@ -4,27 +4,6 @@ import json
 from currencies import currency_dict
 import sys
 
-def create_parser():
-    parser = argparse.ArgumentParser(description="Currency Conversion Tool")
-    parser.add_argument("-a", "--all", action="store_true",
-                        help="Show all available currencies")
-    parser.add_argument("-r","--rate",metavar="CURRENCY_CODE",dest="currency_code",
-        choices=[
-            'AUD','BGN','BRL','CAD','CHF','CNY','CZK','DKK','EUR',
-            'GBP','HKD','HRK','HUF','IDR','ILS','INR','ISK','JPY',
-            'KRW','MXN','MYR','NOK','NZD','PHP','PLN','RON','RUB',
-            'SEK','SGD','THB','TRY','USD','ZAR'],
-        help="Enter a currency code to see its current exchange rate against the USD. "
-        "Valid choices are: 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', "
-        "'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', "
-        "'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', "
-        "'TRY', 'USD', 'ZAR'.")
-    parser.add_argument("-c","--convert", nargs=3, dest="conversion_lst",
-                        metavar=("Amount","Currency_1","Currency_2"),
-                        help="Convert the amount from Curency_1 to Currency_2")
-    args = parser.parse_args()
-    return args
-
 
 def api_parse():
     url = "https://api.freecurrencyapi.com/v1/latest"
@@ -35,6 +14,28 @@ def api_parse():
         return data
     else:
         print(f"Information not found")
+
+
+def create_parser(lst_currencies):
+    parser = argparse.ArgumentParser(description="Currency Conversion Tool")
+    parser.add_argument("-a", "--all", action="store_true",
+                        help="Show all available currencies")
+    parser.add_argument("-r","--rate",metavar="CURRENCY_CODE",dest="currency_code",
+        choices=lst_currencies,
+        help="Enter a currency code to see its current exchange rate against the USD. "
+             f"Valid choices are: {lst_currencies}")
+    parser.add_argument("-c","--convert", nargs=3, dest="conversion_lst",
+                        metavar=("Amount","Currency_1","Currency_2"),
+                        help="Convert the amount from Curency_1 to Currency_2")
+    args = parser.parse_args()
+    return args
+
+
+def make_lst_currencies(data):
+    lst_currencies = []
+    for item in data['data']:
+        lst_currencies.append(item)
+    return lst_currencies
 
 
 def output_all_currencies(data):
@@ -62,8 +63,9 @@ def convert_value(data, conversion_lst):
 
 
 def main():
-    args = create_parser()
     data = api_parse()
+    lst_currencies = make_lst_currencies(data)
+    args = create_parser(lst_currencies)
     if args.all:
         output_all_currencies(data)
     if args.currency_code:
