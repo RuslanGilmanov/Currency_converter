@@ -52,6 +52,8 @@ def show_exchange_rate(data, currency_code):
 def convert_value(data, conversion_lst):
     try:
         initial_amount = float(conversion_lst[0])
+        if initial_amount < 0:
+            sys.exit("The amount is negative. Enter positive amount")
         from_currency = conversion_lst[1]
         to_currency = conversion_lst[2]
     except ValueError:
@@ -71,7 +73,7 @@ def main():
     if args.currency_code:
         currency_code = args.currency_code
         exchange_rate = show_exchange_rate(data, currency_code)
-        print(f"Exchange rate of the {args.currency_code} is {exchange_rate} against the USD")
+        print(f"Exchange rate of the {args.currency_code} is {exchange_rate:.3f} against the USD")
     if args.conversion_lst:
         conversion_lst = args.conversion_lst
         value = convert_value(data, conversion_lst)
