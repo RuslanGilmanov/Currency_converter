@@ -5,6 +5,9 @@ from currencies import currency_dict
 import sys
 
 
+lst_currencies = []
+
+
 def api_parse():
     url = "https://api.freecurrencyapi.com/v1/latest"
     params = {"apikey": "fca_live_H1uIqNDvfJMVIlGuaZnEcZXlJU1iKFWLtoFJGxoC"}
@@ -16,7 +19,7 @@ def api_parse():
         print(f"Information not found")
 
 
-def create_parser(lst_currencies):
+def create_parser():
     parser = argparse.ArgumentParser(description="Currency Conversion Tool")
     parser.add_argument("-a", "--all", action="store_true",
                         help="Show all available currencies")
@@ -31,8 +34,7 @@ def create_parser(lst_currencies):
     return args
 
 
-def make_lst_currencies(data):
-    lst_currencies = []
+def make_lst_currencies(data): 
     for item in data['data']:
         lst_currencies.append(item)
     return lst_currencies
@@ -54,8 +56,7 @@ def convert_value(data, conversion_lst):
         initial_amount = float(conversion_lst[0])
         if initial_amount < 0:
             sys.exit("The amount is negative. Enter positive amount")
-        from_currency = conversion_lst[1]
-        to_currency = conversion_lst[2]
+        from_currency, to_currency = check_currency_codes(conversion_lst)
     except ValueError:
         sys.exit("Entered amount is not a number. Examples: 100, 34.50")
     else:
@@ -64,10 +65,25 @@ def convert_value(data, conversion_lst):
     return converted_amount
 
 
+def check_currency_codes(conversion_lst):
+    currency_in = conversion_lst[1]
+    currency_out = conversion_lst[2]
+    try:
+        for cur_code in conversion_lst[1:]:
+            cur_code in lst_currencies
+    except ValueError:
+        sys.exit(f"The currency code {cur_code} is not on the list")
+    else:
+        if currency_in != currency_out:
+            return (currency_in, currency_out)
+        else:
+            sys.exit(f"You must enter different currency codes. Example: USD AUD")
+
+
 def main():
     data = api_parse()
     lst_currencies = make_lst_currencies(data)
-    args = create_parser(lst_currencies)
+    args = create_parser()
     if args.all:
         output_all_currencies(data)
     if args.currency_code:
