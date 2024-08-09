@@ -30,6 +30,11 @@ def create_parser():
     parser.add_argument("-c","--convert", nargs=3, dest="conversion_lst",
                         metavar=("Amount","Currency_1","Currency_2"),
                         help="Convert the amount from Curency_1 to Currency_2")
+    
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     args = parser.parse_args()
     return args
 
@@ -70,14 +75,15 @@ def check_currency_codes(conversion_lst):
     currency_out = conversion_lst[2]
     try:
         for cur_code in conversion_lst[1:]:
-            cur_code in lst_currencies
+            if cur_code not in lst_currencies:
+                raise ValueError
     except ValueError:
-        sys.exit(f"The currency code {cur_code} is not on the list")
+        sys.exit(f"Currency {cur_code} cannot be converted. Choose from the available correncies.")
     else:
         if currency_in != currency_out:
             return (currency_in, currency_out)
         else:
-            sys.exit(f"You must enter different currency codes. Example: USD AUD")
+            sys.exit(f"You must enter two different currency codes. Example: USD AUD")
 
 
 def main():
