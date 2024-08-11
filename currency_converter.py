@@ -5,21 +5,19 @@ from currencies import currency_dict
 import sys
 from config import API_KEY
 
-lst_currencies = []
 
-
-def api_parse():
-    url = "https://api.freecurrencyapi.com/v1/latest"
+def api_parse(api_url, API_KEY):
+    url = api_url
     params = {"apikey": API_KEY}
     response = requests.get(url, params)
     if response.status_code == 200:
         data = json.loads(response.text)
         return data
     else:
-        print(f"Information not found")
+        raise ValueError("Information not found")
 
 
-def create_parser():
+def create_parser(lst_currencies):
     parser = argparse.ArgumentParser(description="Currency Conversion Tool")
     parser.add_argument("-a", "--all", action="store_true",
                         help="Show all available currencies")
@@ -30,18 +28,12 @@ def create_parser():
     parser.add_argument("-c","--convert", nargs=3, dest="conversion_lst",
                         metavar=("Amount","Currency_1","Currency_2"),
                         help="Convert the amount from Curency_1 to Currency_2")
-    
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
 
-    args = parser.parse_args()
-    return args
+    return parser
 
 
-def make_lst_currencies(data): 
-    for item in data['data']:
-        lst_currencies.append(item)
+def make_lst_currencies(data):
+    lst_currencies = list(data['data'].keys())
     return lst_currencies
 
 
@@ -86,10 +78,17 @@ def check_currency_codes(conversion_lst):
             sys.exit(f"You must enter two different currency codes. Example: USD AUD")
 
 
-def main():
-    data = api_parse()
+def main(url, API_KEY):
+    data = api_parse(url, API_KEY)
     lst_currencies = make_lst_currencies(data)
-    args = create_parser()
+    parser = create_parser(lst_currencies)
+
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+    args = parser.parse_args()
+
     if args.all:
         output_all_currencies(data)
     if args.currency_code:
@@ -103,4 +102,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    api_url = "https://api.freecurrencyapi.com/v1/latest"
+    API_KEY = API_KEY
+    main(api_url, API_KEY)
