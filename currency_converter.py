@@ -3,14 +3,14 @@ import requests
 import json
 from currencies import currency_dict
 import sys
-
+from config import API_KEY
 
 lst_currencies = []
 
 
 def api_parse():
     url = "https://api.freecurrencyapi.com/v1/latest"
-    params = {"apikey": "fca_live_H1uIqNDvfJMVIlGuaZnEcZXlJU1iKFWLtoFJGxoC"}
+    params = {"apikey": API_KEY}
     response = requests.get(url, params)
     if response.status_code == 200:
         data = json.loads(response.text)
@@ -78,7 +78,7 @@ def check_currency_codes(conversion_lst):
             if cur_code not in lst_currencies:
                 raise ValueError
     except ValueError:
-        sys.exit(f"Currency {cur_code} cannot be converted. Choose from the available correncies.")
+        sys.exit(f"Currency {cur_code} cannot be converted. Choose from the available currencies.")
     else:
         if currency_in != currency_out:
             return (currency_in, currency_out)
