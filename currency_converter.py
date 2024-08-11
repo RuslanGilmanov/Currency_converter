@@ -38,9 +38,11 @@ def make_lst_currencies(data):
 
 
 def output_all_currencies(data):
+    output_lst = []
     for item in data['data']:
         if item in currency_dict.keys():
-            print(f"{item} - {currency_dict[item]}")
+            output_lst.append(f"{item} - {currency_dict[item]}")
+    return "\n".join(output_lst)
 
 
 def show_exchange_rate(data, currency_code):
@@ -90,7 +92,7 @@ def main(url, API_KEY):
     args = parser.parse_args()
 
     if args.all:
-        output_all_currencies(data)
+        print(output_all_currencies(data))
     if args.currency_code:
         currency_code = args.currency_code
         exchange_rate = show_exchange_rate(data, currency_code)
