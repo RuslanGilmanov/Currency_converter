@@ -53,27 +53,27 @@ def show_exchange_rate(data, currency_code):
 def convert_value(data, conversion_lst, lst_currencies):
     try:
         initial_amount = float(conversion_lst[0])
-        if initial_amount <= 0:
-            raise  ValueError
-        from_currency, to_currency = check_currency_codes(conversion_lst, lst_currencies)
     except ValueError:
         raise ValueError("Entered amount is not a number. Enter a positive amount")
-    else:
-        converted_amount = (initial_amount / data['data'][from_currency]) * \
+    if initial_amount <= 0:
+        raise  ValueError("Entered amount is not a positive number. Enter a positive amount")
+    
+    from_currency, to_currency = check_currency_codes(conversion_lst, lst_currencies)
+    
+    converted_amount = (initial_amount / data['data'][from_currency]) * \
                            data['data'][to_currency]
     return converted_amount
 
 
 def check_currency_codes(conversion_lst, lst_currencies):
     currency_in, currency_out = conversion_lst[1], conversion_lst[2]
-    for cur_code in conversion_lst[1:]:
-        if cur_code not in lst_currencies:
-            raise ValueError(f"Currency {cur_code} cannot be converted. Choose from the available currencies.")
-
-    if currency_in != currency_out:
-        return (currency_in, currency_out)
-    else:
+    
+    if currency_in not in lst_currencies or currency_out not in lst_currencies:
+        raise ValueError(f"One or both currencies are invalid. Choose from the available currencies.")
+    if currency_in == currency_out:
         raise ValueError(f"You must enter two different currency codes. Example: USD AUD")
+    
+    return currency_in, currency_out
 
 
 def main(url, API_KEY):
@@ -93,8 +93,11 @@ def main(url, API_KEY):
         exchange_rate = show_exchange_rate(data, args.currency_code)
         print(f"Exchange rate of the {args.currency_code} is {exchange_rate:.3f} against the USD")
     if args.conversion_lst:
-        value = convert_value(data, args.conversion_lst, lst_currencies)
-        print(f"{conversion_lst[0]} {conversion_lst[1]} is {value:.2f} {conversion_lst[2]}")
+        try:
+            value = convert_value(data, args.conversion_lst, lst_currencies)
+            print(f"{args.conversion_lst[0]} {args.conversion_lst[1]} is {value:.2f} {args.conversion_lst[2]}")
+        except ValueError as e:
+            print(e)
 
 
 if __name__ == "__main__":
