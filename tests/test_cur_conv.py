@@ -1,6 +1,7 @@
 import pytest
 import argparse
-from currency_converter import create_parser
+from currency_converter import create_parser, main
+from config import API_KEY
 
 lst_currencies = ['USD', 'EUR', 'JPY', 'GBP']
 
@@ -32,3 +33,11 @@ def test_parser_convert():
     assert args.all == False
     assert args.currency_code == None
     assert args.conversion_lst == ['100', 'USD', 'AUD']
+
+
+def test_parser_no_arguments():
+    api_url = "https://api.freecurrencyapi.com/v1/latest"
+    parser = create_parser(lst_currencies)
+    args = parser.parse_args([])
+    with pytest.raises(SystemExit):
+        main(api_url, API_KEY)
