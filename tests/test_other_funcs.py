@@ -30,16 +30,15 @@ def test_convert_value_valid():
     assert convert_value(api_data, conversion_lst, lst_currencies) == 91.41001224
 
 
-@pytest.mark.parametrize('conv_lst, expected_error', [(['0', 'USD', 'EUR'], ValueError),
-                                                      (['-10', 'USD', 'EUR'], ValueError),
-                                                      (['-10', 'USD', 'USD'], ValueError),
-                                                      (['-10', 'USD', 'KZT'], ValueError),
-                                                      (['-10', 'RUB', 'KZT'], ValueError),
-                                                      (['Hello', 'USD', 'AUD'], ValueError),
-
+@pytest.mark.parametrize('conv_lst', [['0', 'USD', 'EUR'],
+                                      ['-10', 'USD', 'EUR'],
+                                      ['-10', 'USD', 'USD'],
+                                      ['-10', 'USD', 'KZT'],
+                                      ['-10', 'RUB', 'KZT'],
+                                      ['Hello', 'USD', 'AUD']
 ])
-def test_convert_value_invalid(conv_lst, expected_error):
-    with pytest.raises(expected_error):
+def test_convert_value_invalid(conv_lst):
+    with pytest.raises(ValueError):
         convert_value(api_data, conv_lst, lst_currencies)
 
 
@@ -48,12 +47,11 @@ def test_check_currency_codes_valid():
     assert check_currency_codes(conversion_lst, lst_currencies) == ('USD', 'EUR')
 
 
-@pytest.mark.parametrize('conv_lst, expected_error', [(['100', 'USD', 'USD'], ValueError),
-                                                      (['10', 'USD', 'KZT'], ValueError),
-                                                      (['5', 'RUB', 'KZT'], ValueError),
-
+@pytest.mark.parametrize('conv_lst', [['100', 'USD', 'USD'],
+                                      ['10', 'USD', 'KZT'],
+                                      ['5', 'RUB', 'KZT']
 ])
-def test_check_currency_codes_invalid(conv_lst, expected_error):
-    with pytest.raises(expected_error):
+def test_check_currency_codes_invalid(conv_lst):
+    with pytest.raises(ValueError):
         convert_value(api_data, conv_lst, lst_currencies)
 
